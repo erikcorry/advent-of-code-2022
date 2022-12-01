@@ -4,8 +4,6 @@ sum elf/List -> int:
   return elf.reduce --initial=0: | a b | a + (int.parse b)
 
 main:
-  biggest := 0
-  current := 0
   elves := []
   lines := (file.read_content "input1.txt").to_string.split "\n"
   previous_gap := -1
