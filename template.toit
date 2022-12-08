@@ -7,7 +7,7 @@ import host.file
 // Run with `jag run -d host template.toit`
 
 main:
-  lines /List := (file.read_content "input1.txt").to_string.split "\n"
+  lines /List := (file.read_content "inputx.txt").to_string.trim.split "\n"
   // Do the magic on the lines.  You may want to use `int.parse` to convert
   // strings to integers.
 
