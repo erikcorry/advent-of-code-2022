@@ -1,4 +1,5 @@
 import host.file
+import .aoc
 
 /// Solution for Day 7 of Advent of Code 2022.
 /// See https://adventofcode.com/2022/day/7
@@ -43,27 +44,24 @@ populate -> Dir:
   root := Dir
   cwd := root
   (file.read_content "input7.txt").to_string.trim.split "\n": | line/string |
-    if line.starts_with "\$ ":
-      command := line[2..]
-      if command.starts_with "cd ":
-        dirname := command[3..]
-        if dirname == "..":
-          cwd = cwd.parent
-        else if dirname == "/":
-          cwd = root
-        else:
-          cwd = (cwd.lookup dirname) as Dir
-    else:
-      if line.starts_with "dir ":
+    split2 line " ": | left right |
+      if left == "\$":
+        split_up_to 2 right " ": | exe arg |
+          if exe == "cd":
+            if arg == "..":
+              cwd = cwd.parent
+            else if arg == "/":
+              cwd = root
+            else:
+              cwd = (cwd.lookup arg) as Dir
+      else if left == "dir":
         cwd.add
-            line[4..]
+            right
             (Dir --parent=cwd)
       else:
-        idx := line.index_of " "
-        size := int.parse line[..idx]
-        name := line[idx + 1..]
+        size := int.parse left
         cwd.add
-            name
+            right
             File size
   return root
 
@@ -72,21 +70,17 @@ main:
 
   SMALL_DIR_LIMIT := 100_000
 
-  small_dirs_total := 0
-  root.find: | name/string file_or_dir/FileOrDir |
+  dirs := []
+  root.find: | _ file_or_dir/FileOrDir |
     if file_or_dir is Dir:
-      if file_or_dir.size <= SMALL_DIR_LIMIT:
-        small_dirs_total += file_or_dir.size
-  print small_dirs_total
+      dirs.add file_or_dir
+
+  print
+      sum (dirs.filter: it.size < SMALL_DIR_LIMIT): it.size
 
   TOTAL  ::= 70_000_000
   NEEDED := 30_000_000
   must_free := NEEDED + root.size - TOTAL
 
-  best := null
-  root.find: | name/string file_or_dir/FileOrDir |
-    if file_or_dir is Dir:
-      if file_or_dir.size > must_free:
-        if best == null or file_or_dir.size < best.size:
-          best = file_or_dir
-  print best.size
+  print
+      lowest_score dirs: | dir | dir.size > must_free ? dir.size : int.MAX

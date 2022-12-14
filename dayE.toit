@@ -1,16 +1,5 @@
 import host.file
-
-class Coord:
-  x /int
-  y /int
-
-  constructor .x .y:
-
-  operator == other:
-    return other is Coord and other.x == x and other.y == y
-
-  hash_code:
-    return x * 12317 + y * 43
+import .aoc
 
 main:
   run --floor=false
@@ -22,21 +11,21 @@ run --floor:
   lines.do:
     prev := null
     it.split " -> ": | pair/string |
-      nums := (pair.split ",").map: int.parse it
-      current := Coord nums[0] nums[1]
-      if prev == null:
-        prev = current
-      else:
-        x := current.x
-        y := current.y
-        while x != prev.x or y != prev.y:
-          set.add (Coord x y)
-          x += (prev.x - current.x).sign
-          y += (prev.y - current.y).sign
-        set.add prev
-        prev = current
+      split2 pair "," (: int.parse it): | x y |
+        current := Coord x y
+        if prev == null:
+          prev = current
+        else:
+          x = current.x
+          y = current.y
+          while x != prev.x or y != prev.y:
+            set.add (Coord x y)
+            x += (prev.x - current.x).sign
+            y += (prev.y - current.y).sign
+          set.add prev
+          prev = current
 
-  max_y := set.reduce --initial=set.first.y: | a b | max a b.y
+  max_y := highest_score set: it.y
 
   for counter := 0; true; counter++:
     sand /Coord? := Coord 500 0

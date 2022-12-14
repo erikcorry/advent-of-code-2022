@@ -1,10 +1,5 @@
 import host.file
-
-class Coord:
-  x/int
-  y/int
-
-  constructor .x .y:
+import .aoc
 
 class Field:
   lines_ /List

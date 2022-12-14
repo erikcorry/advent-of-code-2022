@@ -1,4 +1,5 @@
 import host.file
+import .aoc
 
 abstract class Observer:
   forest /Forest

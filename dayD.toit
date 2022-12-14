@@ -1,4 +1,5 @@
 import host.file
+import .aoc
 
 class Lexer:
   pos := 0
@@ -102,9 +103,9 @@ main:
 
   list.sort --in_place: | a b | a.cmp b
 
-  product := 1
-  for i := 0; i < list.size; i++:
-    thyng/Thyng := list[i]
-    if thyng == two or thyng == six:
-      product *= i + 1
-  print product
+  print
+      product list: | thyng/Thyng index/int |
+        if thyng == two or thyng == six:
+          index + 1
+        else:
+          1
