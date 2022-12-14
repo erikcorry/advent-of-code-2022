@@ -1,8 +1,5 @@
 import host.file
 
-// First install the host package with `jag pkg install`.
-// Run with `jag run -d host template.toit`
-
 class Coord:
   x/int
   y/int
