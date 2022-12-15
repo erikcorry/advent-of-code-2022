@@ -16,6 +16,11 @@ class Coord:
   operator == other/Coord -> bool:
     return other.x == x and other.y == y
 
+  manhattan other/Coord:
+    return (x - other.x).abs + (y - other.y).abs
+
+  stringify: return "($x,$y)"
+
 /**
 Calculates the reduction of the return values from the block.
 The block is called with the reduction so far, the next non-null element (and
