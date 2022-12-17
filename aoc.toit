@@ -230,15 +230,17 @@ split_up_to n/int str/string divider/string [block]:
 split_up_to n/int str/string divider/string [mapping_block] [block]:
   list := str.split divider
   if list.size > n:
-    list = list[0..n - 1]
-    list.add (list[n - 1..].join divider)
+    tail := list[n - 1..].join divider
+    list = list[0..n - 1].copy
+    list.add tail
+  while list.size < 6: list.add null
   return block.call
-      list.size < 1 or list[0] == null ? null : (mapping_block.call list[0])
-      list.size < 2 or list[1] == null ? null : (mapping_block.call list[1])
-      list.size < 3 or list[2] == null ? null : (mapping_block.call list[2])
-      list.size < 4 or list[3] == null ? null : (mapping_block.call list[3])
-      list.size < 5 or list[4] == null ? null : (mapping_block.call list[4])
-      list.size < 6 or list[5] == null ? null : (mapping_block.call list[5])
+      list[0] == null ? null : (mapping_block.call list[0])
+      list[1] == null ? null : (mapping_block.call list[1])
+      list[2] == null ? null : (mapping_block.call list[2])
+      list[3] == null ? null : (mapping_block.call list[3])
+      list[4] == null ? null : (mapping_block.call list[4])
+      list[5] == null ? null : (mapping_block.call list[5])
 
 // Returns a list of n-element lists.
 group n/int list/List -> List:
