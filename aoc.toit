@@ -21,6 +21,16 @@ class Coord:
 
   stringify: return "($x,$y)"
 
+join_arrays list_of_lists/List -> List:
+  result := List
+      sum list_of_lists: it.size
+  position := 0
+  for i := 0; i < list_of_lists.size; i++:
+    list := list_of_lists[i]
+    result.replace position list
+    position += list.size
+  return result
+
 /**
 Calculates the reduction of the return values from the block.
 The block is called with the reduction so far, the next non-null element (and
@@ -271,15 +281,15 @@ lowest_score collection/Collection [score]:
   return best collection --initial=float.INFINITY --compare=(: | a b | b < a) --score=score: | score index element | return score
 
 // Highest scoring index in a list using the score block to evaluate elements.
-highest_scoring_index list/List [--score]:
+highest_scoring_index list/List [score]:
   return best list --initial=-float.INFINITY --compare=(: | a b | b > a) --score=score: | score index element | return index
 
 // Lowest scoring index in a list using the score block to evaluate elements.
-lowest_scoring_index list/List [--score]:
+lowest_scoring_index list/List [score]:
   return best list --initial=float.INFINITY --compare=(: | a b | b < a) --score=score: | score index element | return index
 
 // Highest scoring element in a collection using the score block to evaluate elements.
-highest_scoring_element collection/Collection [--score]:
+highest_scoring_element collection/Collection [score]:
   return best collection --initial=-float.INFINITY --compare=(: | a b | b > a) --score=score: | score index element | return element
 
 // Lowest scoring element in a collection using the score block to evaluate elements.
