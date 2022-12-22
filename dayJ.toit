@@ -1,111 +1,120 @@
 import host.file
 import .aoc
 
+// About half an hour runtime :-/.
+
+GEODE ::= 0
+OBSIDIAN ::= 1
+CLAY ::= 2
+ORE ::= 3
+MINERALS ::= 4
+
+NAMES ::= ["geode", "obsidian", "clay", "ore"]
+NUMBERS ::= {"geode": 0, "obsidian": 1, "clay": 2, "ore": 3}
+
 class State:
-  inventory /Map  // Name to int.
-  robots /Map     // Name to int.
+  inventory /List  // Enum to int.
+  robots /List     // Enum to int.
+  steps /List := []
+
+  geodes -> int: return inventory[GEODE]
 
   constructor:
-    inventory = {"ore": 0, "clay": 0, "obsidian": 0, "geode": 0}
-    robots    = {"ore": 1, "clay": 0, "obsidian": 0, "geode": 0}
+    inventory = [0, 0, 0, 0]
+    robots    = [0, 0, 0, 0]
+    robots[ORE] = 1
 
-  constructor .robots .inventory:
+  constructor .robots .inventory .steps:
 
   stringify -> string: return "inventory: $inventory, robots: $robots"
 
-  hash_code -> int:
-    code := 0
-    inventory.do: | _ value |
-      code *= 97
-      code += value
-    robots.do: | _ value |
-      code *= 97
-      code += value
-    return code
+  operator > other/State:
+    return geodes > other.geodes
 
-  operator == other/State:
-    inventory.do: | product/string count/int | if other.inventory[product] != count: return false
-    robots.do: | product/string count/int | if other.robots[product] != count: return false
-    return true
+  max_geode blueprint/Blueprint minutes_left/int best_so_far/State -> State:
+    if minutes_left == 0: return this
+    // How many geodes can I crack if I do nothing more.
+    my_potential := geodes + minutes_left * robots[GEODE]
+    if my_potential > best_so_far.geodes:
+      new_inventory := List MINERALS:
+        inventory[it] + minutes_left * robots[it]
+      best_so_far = State robots new_inventory steps + ["Let the time run out for $minutes_left, making another $(minutes_left * robots[GEODE]) geodes"]
+    else:
+      // Add the extra geodes I could crack if we assume a new geode machine
+      // arrives every minute from now on.
+      my_potential += triangle_number minutes_left - 2
+      if my_potential <= best_so_far.geodes:
+        return best_so_far
+    if minutes_left > 1:
+      MINERALS.repeat: | mineral |
+        time/int? := blueprint.when_can_i_build mineral this
+        if time and time < minutes_left:
+          new_inventory := List 4: | r |
+            inventory[r] + (time + 1) * robots[r] - blueprint.rules[mineral][r]
+          new_robots := robots.copy
+          new_robots[mineral]++
+          new_steps := steps + ["After $time, spend 1 making $NAMES[mineral] with $(blueprint.describe_recipe mineral), now we have inventory: $new_inventory robots: $new_robots"]
+          attempt := (State new_robots new_inventory new_steps).max_geode blueprint (minutes_left - time - 1) best_so_far
+          if attempt > best_so_far: best_so_far = attempt
+    return best_so_far
 
-  static produce robots/Map inventory -> Map:
-    new_inventory := inventory.copy
-    robots.do: | ingredient number |
-      new_inventory[ingredient] += number
-    return new_inventory
-
-  successors successors/Set blueprint/Blueprint:
-    successors.add this
-    add_successors_ successors inventory robots blueprint.rules
-
-  is_wasting_time blueprint/Blueprint -> bool:
-    // We are wasting time if there is enough ore to make an ore robot or a clay robot, but we don't have any clay robots.
-    if robots["clay"] == 0:
-      if inventory["ore"] > blueprint.rules[0].requirements["ore"] and inventory["ore"] > blueprint.rules[1].requirements["ore"]: return true
-    // We are wasting time if there is enough ore to make an ore robot or a clay robot, but we don't have any obsidian robots.
-    if robots["obsidian"] == 0:
-      if inventory["ore"] > blueprint.rules[0].requirements["ore"] and inventory["ore"] > blueprint.rules[1].requirements["ore"] and inventory["ore"] > blueprint.rules[2].requirements["ore"] and inventory["clay"] > blueprint.rules[2].requirements["clay"]: return true
-    return false
-
-  static add_successors_ successors/Set inventory/Map robots/Map rules/List:
-    rules.do: | rule |
-      possible := true
-      rule.requirements.do: | ingredient/string count/int |
-        if inventory[ingredient] < count:
-          possible = false
-      if possible:
-        new_inventory := inventory.copy
-        new_robots := robots.copy
-        rule.requirements.do: | ingredient/string count/int |
-          new_inventory[ingredient] -= count
-          new_robots[rule.production]++
-        successors.add
-          State new_robots new_inventory
-        add_successors_ successors new_inventory new_robots rules
-
+// 0 -> 1
+// 1 -> 3
+// 2 -> 6
+triangle_number n/int -> int:
+  return ((n + 2) * (n + 1)) >> 1
+      
 class Blueprint:
-  id /int
-  rules /List := []  // Of Rule.
+  rules /List := List MINERALS  // From mineral enum to (list from mineral type to cost).
 
-  constructor .id:
+  when_can_i_build mineral/int state/State -> int?:
+    worst/int := 0
+    MINERALS.repeat: | ingredient |
+      cost := rules[mineral][ingredient]
+      deficit := cost - state.inventory[ingredient]
+      if deficit > 0:
+        production := state.robots[ingredient]
+        if production == 0: return null  // Can never build one with current robots.
+        worst = max ((deficit + production - 1) / production) worst  // Round up.
+    return worst
 
-class Rule:
-  requirements /Map ::= {:}  // Map from name to cost
-  production /string
-
-  constructor .requirements .production:
+  describe_recipe mineral/int -> string:
+    answer := []
+    MINERALS.repeat: | ingredient/int |
+      cost := rules[mineral][ingredient]
+      if cost != 0: answer.add "$cost $(NAMES[ingredient])s"
+    return answer.join ","
 
 main:
   lines /List := (file.read_content "inputJ.txt").to_string.trim.split "\n"
-  lines.do: run it
+  total := 0
+  line_number := 1
+  lines.do: total += line_number++ * (max_geodes it 30)
+  print "part1: $total"
+  product := 1
+  3.repeat: product *= max_geodes lines[it] 32
+  print "part2: $product"
 
-run line/string -> none:
-  split2 line ": ": | blueprint_name/string description/string |
-    blueprint := null
-    split2 blueprint_name " ": | _ id |
-      blueprint = Blueprint (int.parse id)
-    description = description[..description.size - 1]  // Trim dot.
-    description.split ". ": | rule/string |
-      if (rule.index_of " and ") < 0:
-        split6 rule " ": | _ output _ _ cost_str input |
-          cost := int.parse cost_str
-          blueprint.rules.add (Rule {input: cost} output)
-      else:
-        split9 rule " ": | _ output _ _ cost1_str input1 _ cost2_str input2 |
-          cost1 := int.parse cost1_str
-          cost2 := int.parse cost2_str
-          blueprint.rules.add (Rule {input1: cost1, input2: cost2} output)
+max_geodes line/string minutes/int -> int:
+  colon := line.index_of ": "
+  description := line[colon + 2..line.size - 1]
+  blueprint := Blueprint
+  description.split ". ": | rule/string |
+    if (rule.index_of " and ") < 0:
+      split6 rule " ": | _ output _ _ cost input |
+        recipe := List MINERALS: 0
+        recipe[NUMBERS[input]] = int.parse cost
+        blueprint.rules[NUMBERS[output]] = recipe
+    else:
+      split9 rule " ": | _ output _ _ cost1 input1 _ cost2 input2 |
+        recipe := List MINERALS: 0
+        recipe[NUMBERS[input1]] = int.parse cost1
+        recipe[NUMBERS[input2]] = int.parse cost2
+        blueprint.rules[NUMBERS[output]] = recipe
 
-    states := {State}
-
-    24.repeat: | minute |
-      print "Round $minute, $states.size states"
-      next := {}
-      states.do: | state |
-        after_robot_production := {}
-        state.successors after_robot_production blueprint
-        after_robot_production.do: | after |
-          next.add (State after.robots (State.produce state.robots after.inventory) )
-      states = next.filter: not it.is_wasting_time blueprint
-
-    print blueprint.id * (highest_score states: it.inventory["geode"])
+  best_state := (State).max_geode blueprint minutes State
+  geodes := best_state.geodes
+  best_state.steps.do: print it
+  print "Best: $best_state"
+  print ""
+  return geodes
