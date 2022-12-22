@@ -214,7 +214,7 @@ split5 str/string divider1/string divider2/string=divider1 divider3/string=divid
         mapping_block.call fifth
   unreachable
 
-/// Split into six map with mapping block, call block with six arguments
+/// Split into six, map with mapping block, call block with six arguments
 split6 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [block]:
   return split6 str divider1 divider2 divider3 divider4 divider5 (: it) block
 
@@ -229,6 +229,63 @@ split6 str/string divider1/string divider2/string=divider1 divider3/string=divid
         mapping_block.call fourth
         mapping_block.call fifth
         mapping_block.call sixth
+  unreachable
+
+/// Split into seven, map with mapping block, call block with seven arguments
+split7 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [block]:
+  return split7 str divider1 divider2 divider3 divider4 divider5 (: it) block
+
+/// Split into seven, map with mapping block, call block with seven arguments
+split7 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [mapping_block] [block]:
+  split2 str divider1: | first rest |
+    split6 rest divider2 divider3 divider4 divider5: | second third fourth fifth sixth seventh |
+      return block.call
+        mapping_block.call first
+        mapping_block.call second
+        mapping_block.call third
+        mapping_block.call fourth
+        mapping_block.call fifth
+        mapping_block.call sixth
+        mapping_block.call seventh
+  unreachable
+
+/// Split into eight, map with mapping block, call block with eight arguments
+split8 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [block]:
+  return split8 str divider1 divider2 divider3 divider4 divider5 (: it) block
+
+/// Split into eight, map with mapping block, call block with eight arguments
+split8 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [mapping_block] [block]:
+  split2 str divider1: | first rest |
+    split7 rest divider2 divider3 divider4 divider5: | second third fourth fifth sixth seventh eighth |
+      return block.call
+        mapping_block.call first
+        mapping_block.call second
+        mapping_block.call third
+        mapping_block.call fourth
+        mapping_block.call fifth
+        mapping_block.call sixth
+        mapping_block.call seventh
+        mapping_block.call eighth
+  unreachable
+
+/// Split into nine, map with mapping block, call block with nine arguments
+split9 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [block]:
+  return split9 str divider1 divider2 divider3 divider4 divider5 (: it) block
+
+/// Split into nine, map with mapping block, call block with nine arguments
+split9 str/string divider1/string divider2/string=divider1 divider3/string=divider2 divider4/string=divider3 divider5/string=divider4 [mapping_block] [block]:
+  split2 str divider1: | first rest |
+    split8 rest divider2 divider3 divider4 divider5: | second third fourth fifth sixth seventh eighth ninth |
+      return block.call
+        mapping_block.call first
+        mapping_block.call second
+        mapping_block.call third
+        mapping_block.call fourth
+        mapping_block.call fifth
+        mapping_block.call sixth
+        mapping_block.call seventh
+        mapping_block.call eighth
+        mapping_block.call ninth
   unreachable
 
 /// Split into up to n, call block with n arguments, some may be null.
