@@ -70,5 +70,3 @@ decide world/Set elf/Elf first_dir/int [block] -> bool:
       block.call elf.x+DIRECTIONS[direction][0] elf.y+DIRECTIONS[direction][1]
       return true
   return false
-
-
