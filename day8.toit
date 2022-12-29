@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 abstract class Observer:
   forest /Forest
@@ -38,7 +38,7 @@ class ScoreEvaluator extends Observer:
     return tree_height < height
 
 class Forest:
-  rows /List := (file.read_content "input8.txt").to_string.trim.split "\n"
+  rows /List := INPUT8.trim.split "\n"
   visible /List
   xmax /int
   ymax /int

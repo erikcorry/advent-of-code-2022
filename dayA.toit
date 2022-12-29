@@ -1,4 +1,4 @@
-import host.file
+import .resources
 import .aoc
 
 main:
@@ -10,7 +10,7 @@ main:
   total := 0
   crt := ByteArray HEIGHT * WIDTH: ' '
 
-  (file.read_content "inputA.txt").to_string.trim.split "\n": | line |
+  INPUTA.trim.split "\n": | line |
     split_up_to 2 line " ": | insn arg |
       x_inc := ?
       t_inc := ?

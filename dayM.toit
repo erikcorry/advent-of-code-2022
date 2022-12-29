@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 DIRECTIONS := [[1, 0], [0, 1], [-1, 0], [0, -1]]
 
@@ -19,7 +19,7 @@ get_height lines/List -> int:
 
 main:
   map := []
-  lines /List := ((file.read_content "inputM.txt").to_string.trim --right).split "\n"
+  lines /List := (INPUTM.trim --right).split "\n"
   WIDTH := get_width lines
   HEIGHT := get_height lines
   lines = lines.map: | line |

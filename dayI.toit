@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 DIRECTIONS ::= [
     [0, 0, 1],
@@ -26,9 +26,8 @@ get_surface world -> int:
   return surface
 
 main:
-  lines /List := (file.read_content "inputI.txt").to_string.trim.split "\n"
   world := List 23: List 23: ByteArray 23: AIR
-  lines.do:
+  INPUTI.trim.split "\n":
     split3 it "," (: int.parse it): | x y z |
       world[x + 1][y + 1][z + 1] = LAVA
 

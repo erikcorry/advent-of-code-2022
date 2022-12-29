@@ -1,8 +1,8 @@
-import host.file
 import .aoc
+import .resources
 
 main:
-  groups := ((file.read_content "input1.txt").to_string.trim.split "\n\n").map: it.split "\n"
+  groups := (INPUT1.trim.split "\n\n").map: it.split "\n"
   calories := groups.map: sum it: int.parse it
   sorted := calories.sort: | a b | b - a
   print sorted[0]

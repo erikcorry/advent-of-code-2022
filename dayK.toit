@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 class Number:
   value /int
@@ -13,14 +13,15 @@ main:
   run 811589153 10
 
 run multiplier iterations:
-  number_strings /List := (file.read_content "inputK.txt").to_string.trim.split "\n"
+  size := 0
+  INPUTK.trim.split "\n": size++
+  numbers /List := List size
   zero := null
-  numbers /List := List number_strings.size:
-    obj := Number multiplier * (int.parse number_strings[it])
+  index := 0
+  INPUTK.trim.split "\n":
+    obj := Number multiplier * (int.parse it)
     if obj.value == 0: zero = obj
-    obj
-
-  NUMBERS_SIZE ::= numbers.size
+    numbers[index++] = obj
 
   iteration_order /List := numbers.copy
 
@@ -28,29 +29,34 @@ run multiplier iterations:
     print it
     iteration_order.do: | n/Number |
       current_position := numbers.index_of n
-      distance := mod n.value (NUMBERS_SIZE * (NUMBERS_SIZE - 1))
+      distance := mod n.value (size * (size - 1))
       pos := current_position
 
       // For very high numbers of rotations we can rotate all the numbers
       // except the current one by the div, and then just do the mod.
-      high_level_rotations := distance / NUMBERS_SIZE
-      distance %= NUMBERS_SIZE
+      high_level_rotations := distance / size
+      distance %= size
 
       other_numbers := numbers[current_position + 1..] + numbers[..current_position]
       other_numbers = other_numbers[high_level_rotations..] + other_numbers[..high_level_rotations]
-      numbers = other_numbers[other_numbers.size - current_position..] + [n] + other_numbers[..other_numbers.size - current_position]
+      numbers = List size
+      part1 := other_numbers[other_numbers.size - current_position..]
+      part3 := other_numbers[..other_numbers.size - current_position]
+      numbers.replace 0 part1
+      numbers[part1.size] = n
+      numbers.replace (part1.size + 1) part3
       distance.repeat:
-        mod_pos := pos % NUMBERS_SIZE
-        next_pos := (pos + 1) % NUMBERS_SIZE
+        mod_pos := pos % size
+        next_pos := (pos + 1) % size
         numbers[mod_pos] = numbers[next_pos]
         pos++
-      resting_place := (current_position + distance) % NUMBERS_SIZE
+      resting_place := (current_position + distance) % size
       numbers[resting_place] = n
   sum := 0
   zero_position := numbers.index_of zero
-  sum += numbers[(zero_position + 1000) % NUMBERS_SIZE].value
-  sum += numbers[(zero_position + 2000) % NUMBERS_SIZE].value
-  sum += numbers[(zero_position + 3000) % NUMBERS_SIZE].value
+  sum += numbers[(zero_position + 1000) % size].value
+  sum += numbers[(zero_position + 2000) % size].value
+  sum += numbers[(zero_position + 3000) % size].value
   print sum
 
 // Mod that always returns a positive number.

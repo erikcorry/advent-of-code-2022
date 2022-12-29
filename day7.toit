@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 /// Solution for Day 7 of Advent of Code 2022.
 /// See https://adventofcode.com/2022/day/7
@@ -43,7 +43,7 @@ class Dir extends FileOrDir:
 populate -> Dir:
   root := Dir
   cwd := root
-  (file.read_content "input7.txt").to_string.trim.split "\n": | line/string |
+  INPUT7.trim.split "\n": | line/string |
     split2 line " ": | left right |
       if left == "\$":
         split_up_to 2 right " ": | exe arg |

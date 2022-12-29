@@ -1,4 +1,4 @@
-import host.file
+import .resources
 
 class Monkey:
   items /List := []
@@ -44,7 +44,7 @@ main:
 run iterations/int --divide/bool:
   monkeys ::= []
 
-  (file.read_content "inputB.txt").to_string.trim.split "\n\n":
+  INPUTB.trim.split "\n\n":
     lines := it.split "\n"
     items := ((lines[1].split ": ")[1].split ", ").map: int.parse it
     // Line 2 is the expression.  Instead of an expression parser we just

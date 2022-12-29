@@ -1,4 +1,4 @@
-import host.file
+import .resources
 
 SCORE_TABLE ::= {
   "A X": 4, "B X": 1, "C X": 7,
@@ -15,7 +15,7 @@ PLAY_TABLE ::= [
 main:
   score := 0
   score2 := 0
-  (file.read_content "input2.txt").to_string.split "\n": | line |
+  INPUT2.split "\n": | line |
     if line != "":
       // First half.
       score += SCORE_TABLE[line]

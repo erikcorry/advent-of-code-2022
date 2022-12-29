@@ -1,11 +1,11 @@
-import host.file
+import .resources
 
 main:
   run 4
   run 14
 
 run limit/int:
-  line /string := (file.read_content "input6.txt").to_string.trim
+  line /string := INPUT6.trim
   mask := 0
   deque := Deque
   line.size.repeat: | i |

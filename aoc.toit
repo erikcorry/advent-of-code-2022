@@ -31,6 +31,83 @@ join_arrays list_of_lists/List -> List:
     position += list.size
   return result
 
+class PixelSet implements Collection:
+  // A map from encoded coordinates to bits.
+  // Each X coordinate is rounded to the nearest 16 bits.
+  map_ /Map := {:}
+  size_ := 0
+
+  size -> int:
+    return size_
+
+  operator == other/PixelSet -> bool:
+    if other.size != size: return false
+    map_.do: | location/int bits/int |
+      other_bits := other.map_.get location --if_absent=:0
+      if bits != other_bits: return false
+    return true
+
+  key_ coord/Coord -> int:
+    x := coord.x & ~15
+    y := coord.y
+    if not (-15000 <= x < 15000 and -15000 <= y < 15000): throw "Can't encode $x, $y"
+    return x + 15000 + (y + 15000) * 30000
+
+  mask_ coord/Coord -> int:
+    return 1 << (coord.x & 15)
+
+  add coord/Coord -> none:
+    map_.update (key_ coord) --init=0: | bits |
+      mask := mask_ coord
+      if bits & mask == 0:
+        size_++
+      bits | mask
+
+  remove coord/Coord -> none:
+    if contains coord:
+      size_--
+      map_[key_ coord] &= ~(mask_ coord)
+
+  contains coord/Coord -> bool:
+    bits := map_.get (key_ coord) --if_absent=: return false
+    return bits & (mask_ coord) != 0
+
+  do [block]:
+    map_.do: | location/int bits/int |
+      x := location % 30000 - 15000
+      y := location / 30000 - 15000
+      while bits != 0:
+        x2 := bits.count_trailing_zeros
+        coord := Coord (x + x2) y
+        block.call coord
+        bits &= ~(mask_ coord)
+
+  is_empty -> bool: return size == 0
+
+  every [block] -> bool:
+    do: if not block.call it: return false
+    return true
+
+  any [block] -> bool:
+    do: if block.call it: return true
+    return false
+
+  reduce [block] -> any:
+    return reduce_ true null block
+
+  reduce --initial [block] -> any:
+    return reduce_ false initial block
+
+  reduce_ first accumulator [block] -> any:
+    do: | coord/Coord |
+      if first:
+        accumulator = coord
+        first = false
+      else:
+        accumulator = block.call accumulator coord
+    if first: throw "Not enough elements"
+    return accumulator
+
 /**
 Calculates the reduction of the return values from the block.
 The block is called with the reduction so far, the next non-null element (and

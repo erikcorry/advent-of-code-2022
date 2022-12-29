@@ -1,11 +1,8 @@
-import host.file
 import .aoc
-
-// First install the host package with `jag pkg install`.
-// Run with `jag run -d host template.toit`
+import .resources
 
 main:
-  lines /List := (file.read_content "inputF.txt").to_string.trim.split "\n"
+  lines /List := INPUTF.trim.split "\n"
   beacons := Set  // Places that have a beacon.
   sensors := Map
   lines.do:

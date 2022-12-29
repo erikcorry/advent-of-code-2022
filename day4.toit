@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 class WorkRange:
   from /int := 0
@@ -18,7 +18,7 @@ class WorkRange:
            other.from <=       from <= other.to
 
 main:
-  lines := (file.read_content "input4.txt").to_string.trim.split "\n"
+  lines := INPUT4.trim.split "\n"
   print (count (lines.map: split2 it "," (: WorkRange it): | l r |
     (l.surrounds r) or (r.surrounds l)))
   print (count (lines.map: split2 it "," (: WorkRange it): | l r |

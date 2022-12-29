@@ -1,4 +1,4 @@
-import host.file
+import .resources
 import .aoc
 
 // About half an hour runtime :-/.
@@ -12,10 +12,12 @@ MINERALS ::= 4
 NAMES ::= ["geode", "obsidian", "clay", "ore"]
 NUMBERS ::= {"geode": 0, "obsidian": 1, "clay": 2, "ore": 3}
 
+DESCRIBE_STEPS ::= false
+
 class State:
   inventory /List  // Enum to int.
   robots /List     // Enum to int.
-  steps /List := []
+  steps /List? := null
 
   geodes -> int: return inventory[GEODE]
 
@@ -38,7 +40,10 @@ class State:
     if my_potential > best_so_far.geodes:
       new_inventory := List MINERALS:
         inventory[it] + minutes_left * robots[it]
-      best_so_far = State robots new_inventory steps + ["Let the time run out for $minutes_left, making another $(minutes_left * robots[GEODE]) geodes"]
+      new_steps := null
+      if DESCRIBE_STEPS:
+        new_steps = steps + ["Let the time run out for $minutes_left, making another $(minutes_left * robots[GEODE]) geodes"]
+      best_so_far = State robots new_inventory new_steps
     else:
       // Add the extra geodes I could crack if we assume a new geode machine
       // arrives every minute from now on.
@@ -53,7 +58,9 @@ class State:
             inventory[r] + (time + 1) * robots[r] - blueprint.rules[mineral][r]
           new_robots := robots.copy
           new_robots[mineral]++
-          new_steps := steps + ["After $time, spend 1 making $NAMES[mineral] with $(blueprint.describe_recipe mineral), now we have inventory: $new_inventory robots: $new_robots"]
+          new_steps := null
+          if DESCRIBE_STEPS:
+            new_steps = steps + ["After $time, spend 1 making $NAMES[mineral] with $(blueprint.describe_recipe mineral), now we have inventory: $new_inventory robots: $new_robots"]
           attempt := (State new_robots new_inventory new_steps).max_geode blueprint (minutes_left - time - 1) best_so_far
           if attempt > best_so_far: best_so_far = attempt
     return best_so_far
@@ -86,7 +93,7 @@ class Blueprint:
     return answer.join ","
 
 main:
-  lines /List := (file.read_content "inputJ.txt").to_string.trim.split "\n"
+  lines /List := INPUTJ.trim.split "\n"
   total := 0
   line_number := 1
   lines.do: total += line_number++ * (max_geodes it 30)
@@ -114,7 +121,7 @@ max_geodes line/string minutes/int -> int:
 
   best_state := (State).max_geode blueprint minutes State
   geodes := best_state.geodes
-  best_state.steps.do: print it
+  if best_state.steps: best_state.steps.do: print it
   print "Best: $best_state"
   print ""
   return geodes

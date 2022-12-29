@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 // First install the host package with `jag pkg install`.
 // Run with `jag run -d host template.toit`
@@ -16,7 +16,7 @@ CHARS := "=-012"
 
 main:
   total :=
-      sum ((file.read_content "inputP.txt").to_string.trim.split "\n"): | txt/string |
+      sum (INPUTP.trim.split "\n"): | txt/string |
         l /List := List txt.size: TR[txt[it]]
         l.reduce: | t c | t * 5 + c
   base5 := total.stringify 5

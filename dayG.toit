@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 class Positions:
   positions /List
@@ -113,7 +113,7 @@ main:
   world.run 26 --players=2
 
 class World:
-  lines /List := (file.read_content "inputG.txt").to_string.trim.split "\n"
+  lines /List := INPUTG.trim.split "\n"
   valves := {:} // From name to bit position.
   names := {:}  // From bit position to name.
   flowrates := []

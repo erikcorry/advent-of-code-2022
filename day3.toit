@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 main:
   part1
@@ -7,7 +7,7 @@ main:
 
 part1:
   total := 0
-  (file.read_content "input3.txt").to_string.trim.split "\n": | line |
+  INPUT3.trim.split "\n": | line |
     left := line[..line.size / 2].to_byte_array
     line[line.size / 2..].do: | char |
       if (left.index_of char) >= 0:
@@ -16,7 +16,7 @@ part1:
   print total
 
 part2:
-  lines := (file.read_content "input3.txt").to_string.trim.split "\n"
+  lines := INPUT3.trim.split "\n"
   print
     sum
       ((group 3 lines).map: (bitand it: bitmap it)).map: it.count_trailing_zeros

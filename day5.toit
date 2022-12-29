@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 main:
   part --one_at_a_time=true
@@ -8,7 +8,7 @@ main:
 part --one_at_a_time/bool:
   // A list of lists.  Each element is a list of crates from bottom to top.
   stacks := []
-  (file.read_content "input5.txt").to_string.trim.split "\n": | line |
+  INPUT5.trim.split "\n": | line |
     if line.contains "[":
       for i := 1; i < line.size; i += 4:
         letter := line[i]

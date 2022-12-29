@@ -1,8 +1,5 @@
-import host.file
 import .aoc
-
-// First install the host package with `jag pkg install`.
-// Run with `jag run -d host template.toit`
+import .resources
 
 class Bitmap:
   left /List
@@ -104,7 +101,7 @@ WIDTH := 0
 HEIGHT := 0
 
 main:
-  lines /List := (file.read_content "inputO.txt").to_string.trim.split "\n"
+  lines /List := INPUTO.trim.split "\n"
   WIDTH = lines[0].size - 2
   HEIGHT = lines.size - 2
   left := Bitmap WIDTH HEIGHT

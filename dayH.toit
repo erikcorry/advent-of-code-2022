@@ -1,4 +1,4 @@
-import host.file
+import .resources
 import .aoc
 
 // First install the host package with `jag pkg install`.
@@ -55,7 +55,7 @@ print_world world/Set -> none:
     print "|$ba.to_string|"
 
 main:
-  line /string := ((file.read_content "inputH.txt").to_string.trim.split "\n")[0]
+  line /string := INPUTH.trim
 
   stack_heights := List line.size: -1
   rock_numbers := List line.size: -1

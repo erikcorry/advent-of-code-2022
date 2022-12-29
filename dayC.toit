@@ -1,11 +1,11 @@
-import host.file
 import .aoc
+import .resources
 
 class Field:
   lines_ /List
 
   constructor:
-    lines_ = (file.read_content "inputC.txt").to_string.trim.split "\n"
+    lines_ = INPUTC.trim.split "\n"
 
   position_of needle/string -> Coord:
     lines_.size.repeat: | y |

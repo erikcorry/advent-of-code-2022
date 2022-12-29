@@ -1,14 +1,13 @@
-import host.file
 import .aoc
+import .resources
 
 main:
   run --floor=false
   run --floor=true
 
 run --floor:
-  set := {}
-  lines /List := (file.read_content "inputE.txt").to_string.trim.split "\n"
-  lines.do:
+  set := PixelSet
+  INPUTE.trim.split "\n":
     prev := null
     it.split " -> ": | pair/string |
       split2 pair "," (: int.parse it): | x y |

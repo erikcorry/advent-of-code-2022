@@ -1,5 +1,5 @@
-import host.file
 import .aoc
+import .resources
 
 class Lexer:
   pos := 0
@@ -22,6 +22,11 @@ class Lexer:
 interface Thyng:
   // Return negative number if this is less than other.
   cmp other/Thyng -> int
+
+  static cmp a/string b/string -> int:
+    a_thing := Thyng (Lexer a)
+    b_thing := Thyng (Lexer b)
+    return a_thing.cmp b_thing
 
   constructor lexer/Lexer:
     if lexer.peek == '[':
@@ -83,28 +88,33 @@ class Ynt implements Thyng:
       return temp.cmp other
 
 main:
-  pairs /List := (file.read_content "inputD.txt").to_string.trim.split "\n\n"
+  pairs /List := INPUTD.trim.split "\n\n"
   sum := 0
   list := []
   for i := 0; i < pairs.size; i++:
     lr := pairs[i].split "\n"
-    left := Thyng (Lexer lr[0])
-    right := Thyng (Lexer lr[1])
+    // Originally we parsed the strings here and created Thyng
+    // instances (either Lyst or Ynt).  That takes too much memory
+    // on an ESP32, so instead we just store the strings.  When we
+    // need to compare them with each other (eg. below for the sort)
+    // we can reify the objects by parsing the strings on demand.
+    left := lr[0]
+    right := lr[1]
     list.add left
     list.add right
-    if (left.cmp right) < 0:
+    if (Thyng.cmp left right) < 0:
       sum += i + 1
   print sum
 
-  two := Thyng (Lexer "[[2]]")
-  six := Thyng (Lexer "[[6]]")
+  two := "[[2]]"
+  six := "[[6]]"
   list.add two
   list.add six
 
-  list.sort --in_place: | a b | a.cmp b
+  list.sort --in_place: | a b | Thyng.cmp a b
 
   print
-      product list: | thyng/Thyng index/int |
+      product list: | thyng/string index/int |
         if thyng == two or thyng == six:
           index + 1
         else:
